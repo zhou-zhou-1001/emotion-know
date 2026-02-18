@@ -1,5 +1,15 @@
 from to_draw import AllPressure
 from suggestion import suggestion
+import sqlite3
+conn = sqlite3.connect('emotion.db')
+c = conn.cursor()
+c.execute('''
+    CREATE TABLE IF NOT EXISTS emotion (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date TEXT NOT NULL,
+        content TEXT NOT NULL
+    )
+''')
 class Emotion (AllPressure):
 
 
@@ -100,12 +110,38 @@ class Emotion (AllPressure):
             except ValueError:
                 print("请写上正确的数值")
 
+    def write(self):
+        time = input('请输入事件日期（格式：YYYY-MM-DD,例如2026-01-01')
+        print(time)
+        thing = input('请输入你想记录的事件')
+        print(thing)
+        c.execute("INSERT INTO emotion (date,content)VALUES (?,?)",
+                  (time, thing))
+        conn.commit()
+        conn.close()
+        print(f"事件已保存")
+
+    def see_all_thing(self):
+        print("正在查询您的学习笔记...")
+        c.execute("SELECT * FROM emotion")
+        all_notes = c.fetchall()
+        if len(all_notes) == 0:
+            print("记录是空的，快去添加一条吧！")
+        else:
+            print(f"共找到 {len(all_notes)} 条笔记：")
+            for note in all_notes:
+                print(f"ID:{note[0]} | 日期:{note[1]}")
+                print(f"内容:{note[2]}")
+        conn.close()
+
     #执行程序
     def start(self):
         while True:
             ask = input("如果你想绘制所有日期的压力值，输入'1'，\n"
             "如果你想查看所有情绪记录，输入'2'，\n"
             "如果你想查看最终压力数值，输入'3'，\n"
+            "如果你想记录事件，输入'4'\n"
+            "如果你想查看事件，输入'5'\n"
             "如果你想退出，输入' out'\n"
             '-------------------------------------------------------------------------------\n')
             print(ask)
@@ -119,6 +155,14 @@ class Emotion (AllPressure):
                 self.input_objective()
                 continue
 
+            elif ask == '4':
+                self.write()
+                continue
+
+            elif ask == '5':
+                self.see_all_thing()
+                continue
+
             elif ask == 'out':
                 print("已完成")
                 break
@@ -126,6 +170,8 @@ class Emotion (AllPressure):
             else:
                 print("请输入正确的数字")
                 continue
+
+
 
 
 #初始化
