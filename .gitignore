@@ -1,5 +1,7 @@
-# 忽略所有 .db 数据库文件
+# 忽略所有数据库文件
 *.db
+*.sqlite
+*.sqlite3
 
 # 忽略Python的缓存文件和虚拟环境
 __pycache__/
