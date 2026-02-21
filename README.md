@@ -2,6 +2,7 @@
 ## Personal sentiment analysis combining objective data and subjective feelings
 结合客观数据和主观感受的个人情感分析：
 
+
 目前可以画出并记录不同主观情绪配比，
 
 一周的压力值变化，
