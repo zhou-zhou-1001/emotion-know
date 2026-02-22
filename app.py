@@ -2,7 +2,7 @@ import plotly.express as px
 import streamlit as st
 import pandas as pd
 import sqlite3
-import datetime as dt
+
 
 import hashlib
 
@@ -13,19 +13,21 @@ if 'user_id' not in st.session_state:
     st.session_state.user_id = user_id
 
 # 显示用户ID
-st.sidebar.markdown("---")
-st.sidebar.info(f" 你的用户ID: `{st.session_state.user_id}`")
-st.sidebar.caption("保存这个ID，可以找回你的数据")
+    st.sidebar.markdown("---")
+    st.sidebar.info(f" 你的用户ID: `{st.session_state.user_id}`")
+
 
 # 使用用户ID创建独立的数据库
-user_id = st.session_state.user_id
+    user_id = st.session_state.user_id
+
+
 
 
 
 
 #初始化
 @st.cache_resource
-def init_db():
+def init_db(user_id):
 
      """初始化数据库连接和表结构"""
      # 连接事件数据库
@@ -57,7 +59,7 @@ def init_db():
     ''')
      conn_emo.commit()
      return conn_thing, c_thing, conn_emo, c_emo
-conn_thing, c_thing, conn_emo, c_emo = init_db()
+conn_thing, c_thing, conn_emo, c_emo = init_db(user_id)
 
 st.sidebar.success( "连接成功")
 st.write("你好，这里是“Emotion Know")
@@ -66,7 +68,7 @@ st.write("你好，这里是“Emotion Know")
 st.subheader("功能预览")
 col1, col2, col3 = st.columns(3)
 with col1:
-    st.metric( "功能块" , "6个" , "完整")
+    st.metric( "功能块" , "3个" , "完整")
 
 with col2:
     st.metric( "数据库" , "2个" ,"已连接")
@@ -210,6 +212,23 @@ with emo_tab1:
 
         with st.form(key="emotion_form"):
             st.write("你的情绪组成：", st.session_state.emotion_dict)
+            st.markdown("情绪分布饼图")
+            emotion_names = list(st.session_state.emotion_dict.keys())
+            emotion_values = list(st.session_state.emotion_dict.values())
+
+            if emotion_names and emotion_values:
+                fig = px.pie(
+                    values=emotion_values,
+                    names=emotion_names,
+                    title=f"情绪分布 - {emotion_date}",
+                )
+
+                fig.update_layout(
+                    showlegend=True
+                )
+
+            st.plotly_chart(fig, use_container_width=True)
+
             complete_button = st.form_submit_button("保存并完成")
 
 
@@ -222,22 +241,7 @@ with emo_tab1:
                 conn_emo.commit()
                 st.balloons()
                 st.success("保存成功")
-                st.markdown("情绪分布饼图")
-                emotion_names = list(st.session_state.emotion_dict.keys())
-                emotion_values = list(st.session_state.emotion_dict.values())
 
-                if emotion_names and emotion_values:
-                    fig = px.pie(
-                        values=emotion_values,
-                        names=emotion_names,
-                        title=f"情绪分布 - {emotion_date}",
-                    )
-
-                fig.update_layout(
-                    showlegend=True
-                )
-
-                st.plotly_chart(fig, use_container_width=True)
 
                 st.session_state.emotion_dict = {}
                 st.session_state.total_remaining = 100
@@ -290,7 +294,7 @@ with emo_tab2 :
             st.metric("总记录数",len(all_emotion))
         with col2:
             if len(all_emotion) > 0:
-                recent_date = events_df['日期'].iloc[0]
+                recent_date = emotions_df['日期'].iloc[0]
                 st.metric("最近记录",recent_date)
 
         st.markdown("---")
@@ -301,7 +305,7 @@ with emo_tab2 :
             record_date = record[1]
             record_emotion = record[2]
 
-            with st.expander(f" 日期 ： {record} - 记录ID ：{record_id}"):
+            with st.expander(f" 日期 ： {record_date} - 记录ID ：{record_id}"):
                 st.write(f"**记录日期：** {record_date}")
                 st.write(f"**记录ID：** {record_id}")
 
