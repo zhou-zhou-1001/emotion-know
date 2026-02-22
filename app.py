@@ -13,12 +13,12 @@ if 'user_id' not in st.session_state:
     st.session_state.user_id = user_id
 
 # 显示用户ID
-    st.sidebar.markdown("---")
-    st.sidebar.info(f" 你的用户ID: `{st.session_state.user_id}`")
+st.sidebar.markdown("---")
+st.sidebar.info(f" 你的用户ID: `{st.session_state.user_id}`")
 
 
 # 使用用户ID创建独立的数据库
-    user_id = st.session_state.user_id
+user_id = st.session_state.user_id
 
 
 
